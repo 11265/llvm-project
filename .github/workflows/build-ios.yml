@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         repository: llvm/llvm-project
         submodules: 'recursive'
@@ -58,14 +58,14 @@ jobs:
           -DLLVM_BUILD_STATIC=ON \
           -DBUILD_SHARED_LIBS=OFF
 
-        cmake --build . --config Release
+        ninja
 
     - name: Package Library
       run: |
         mkdir -p universal/lib
-        cp build-ios-device/lib/libLLVM*.a universal/lib/
-        cp build-ios-device/lib/libclang*.a universal/lib/
-        cp build-ios-device/lib/liblldb*.a universal/lib/
+        
+        # Copy LLVM libraries
+        find build-ios-device/lib -name "*.a" -exec cp {} universal/lib/ \;
         
         # Copy headers
         mkdir -p universal/include
