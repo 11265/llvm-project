@@ -34,7 +34,7 @@ jobs:
       run: |
         mkdir build-ios-device
         cd build-ios-device
-        cmake .. \
+        cmake ../llvm \
           -G Ninja \
           -DCMAKE_TOOLCHAIN_FILE=../ios.toolchain.cmake \
           -DPLATFORM=OS64 \
@@ -81,12 +81,12 @@ jobs:
         mkdir -p universal/lib
         
         # Copy LLVM libraries
-        find . -name "*.a" -exec cp {} universal/lib/ \;
+        find build-ios-device -name "*.a" -exec cp {} universal/lib/ \;
         
         # Copy headers
         mkdir -p universal/include
-        cp -r ../llvm/include/* universal/include/ || true
-        cp -r ../clang/include/* universal/include/ || true
+        cp -r llvm/include/* universal/include/ || true
+        cp -r clang/include/* universal/include/ || true
         
         # Create zip package
         cd universal
