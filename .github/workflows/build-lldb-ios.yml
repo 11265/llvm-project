@@ -48,9 +48,14 @@ jobs:
           -DLLVM_TOOL_LLVM_TBLGEN_BUILD=ON \
           -DLLDB_USE_SYSTEM_DEBUGSERVER=ON \
           -DLLDB_SKIP_TESTS=ON \
+          -DLLDB_INCLUDE_TESTS=OFF \
           -DLLDB_TEST_COMPILER="$(xcrun --find clang)" \
           -DLLDB_TEST_C_COMPILER="$(xcrun --find clang)" \
-          -DLLDB_TEST_CXX_COMPILER="$(xcrun --find clang++)"
+          -DLLDB_TEST_CXX_COMPILER="$(xcrun --find clang++)" \
+          -DLLDB_DISABLE_PYTHON=1 \
+          -DLLDB_DISABLE_CURSES=1 \
+          -DLLDB_DISABLE_LIBEDIT=1 \
+          -DLLDB_DISABLE_LZMA=1
         ninja llvm-tblgen
         NATIVE_TBLGEN=$(pwd)/bin/llvm-tblgen
         cd ..
@@ -97,12 +102,13 @@ jobs:
           -DLLDB_USE_SYSTEM_DEBUGSERVER=ON \
           -DLLDB_SKIP_TESTS=ON \
           -DLLDB_INCLUDE_TESTS=OFF \
-          -DLLDB_TEST_COMPILER="$(xcrun --find clang)" \
-          -DLLDB_TEST_C_COMPILER="$(xcrun --find clang)" \
-          -DLLDB_TEST_CXX_COMPILER="$(xcrun --find clang++)" \
+          -DLLDB_DISABLE_PYTHON=1 \
+          -DLLDB_DISABLE_CURSES=1 \
+          -DLLDB_DISABLE_LIBEDIT=1 \
+          -DLLDB_DISABLE_LZMA=1 \
           -DLLVM_TABLEGEN="$NATIVE_TBLGEN"
 
-        ninja liblldb
+        ninja lldb-core
 
     - name: Package Library
       run: |
