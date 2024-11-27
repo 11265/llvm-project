@@ -53,7 +53,6 @@ jobs:
           -DLLVM_INCLUDE_TESTS=OFF \
           -DLLVM_INCLUDE_EXAMPLES=OFF \
           -DLLVM_ENABLE_BACKTRACES=OFF \
-          -DLLVM_ENABLE_TERMINFO=OFF \
           -DLLVM_ENABLE_ZLIB=OFF \
           -DLLVM_BUILD_STATIC=ON \
           -DBUILD_SHARED_LIBS=OFF \
@@ -78,7 +77,6 @@ jobs:
           -DLLVM_INCLUDE_DOCS=OFF \
           -DLLVM_ENABLE_WARNINGS=OFF \
           -DLLVM_ENABLE_EXPENSIVE_CHECKS=OFF \
-          -DLLVM_ENABLE_TIMESTAMPS=OFF \
           -DLLVM_ENABLE_PLUGINS=OFF \
           -DLLVM_ENABLE_PIC=OFF \
           -DLLVM_BUILD_32_BITS=OFF \
@@ -88,7 +86,8 @@ jobs:
           -DLLVM_ENABLE_DUMP=OFF \
           -DLLVM_ENABLE_LTO=OFF \
           -DLLVM_PARALLEL_COMPILE_JOBS=$(sysctl -n hw.ncpu) \
-          -DLLVM_PARALLEL_LINK_JOBS=$(sysctl -n hw.ncpu)
+          -DLLVM_PARALLEL_LINK_JOBS=$(sysctl -n hw.ncpu) \
+          -DHAVE_STEADY_CLOCK=0
 
         ninja
 
