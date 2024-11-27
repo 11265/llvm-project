@@ -54,7 +54,30 @@ jobs:
           -DLLVM_ENABLE_EH=OFF \
           -DLLVM_ENABLE_TERMINFO=OFF \
           -DLLVM_ENABLE_LIBXML2=OFF \
-          -DLLVM_ENABLE_ZLIB=OFF
+          -DLLVM_ENABLE_ZLIB=OFF \
+          -DLLVM_ENABLE_MODULES=OFF \
+          -DLLVM_ENABLE_PIC=OFF \
+          -DLLVM_ENABLE_PLUGINS=OFF \
+          -DLLVM_ENABLE_WARNINGS=OFF \
+          -DLLVM_ENABLE_LTO=OFF \
+          -DLLVM_ENABLE_EXPENSIVE_CHECKS=OFF \
+          -DLLVM_ENABLE_TIMESTAMPS=OFF \
+          -DLLVM_ENABLE_UNWIND_TABLES=OFF \
+          -DLLVM_ENABLE_INSTALL_RPATH=OFF \
+          -DLLVM_ENABLE_GLOBAL_ISEL=OFF \
+          -DLLVM_ENABLE_DOXYGEN=OFF \
+          -DLLVM_ENABLE_SPHINX=OFF \
+          -DLLVM_ENABLE_ZSTD=OFF \
+          -DLLVM_ENABLE_CURL=OFF \
+          -DLLVM_ENABLE_LIBPFM=OFF \
+          -DLLVM_INCLUDE_TESTS=OFF \
+          -DLLVM_INCLUDE_EXAMPLES=OFF \
+          -DLLVM_INCLUDE_BENCHMARKS=OFF \
+          -DLLVM_INCLUDE_DOCS=OFF \
+          -DLLVM_INCLUDE_RUNTIMES=OFF \
+          -DLLVM_BUILD_RUNTIME=OFF \
+          -DLLVM_TOOL_LLVM_CONFIG_BUILD=OFF \
+          -DLLVM_TOOL_LLVM_MC_BUILD=OFF
         ninja llvm-tblgen
         ls -la bin/  # 检查 bin 目录内容
         NATIVE_TBLGEN="$(pwd)/bin/llvm-tblgen"
