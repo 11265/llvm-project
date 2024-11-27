@@ -46,6 +46,7 @@ jobs:
           -DDEPLOYMENT_TARGET=13.0 \
           -DCMAKE_C_FLAGS="-arch arm64 -Wno-shorten-64-to-32" \
           -DCMAKE_CXX_FLAGS="-arch arm64 -Wno-shorten-64-to-32" \
+          -DCMAKE_EXE_LINKER_FLAGS="-nostartfiles" \
           -DLLVM_TARGETS_TO_BUILD="AArch64" \
           -DLLVM_ENABLE_PROJECTS="" \
           -DLLVM_BUILD_TOOLS=OFF \
@@ -62,7 +63,9 @@ jobs:
           -DLLVM_ENABLE_RTTI=OFF \
           -DLLVM_ENABLE_MODULES=OFF \
           -DLLVM_ENABLE_THREADS=ON \
-          -DLLVM_OPTIMIZED_TABLEGEN=ON \
+          -DLLVM_OPTIMIZED_TABLEGEN=OFF \
+          -DLLVM_USE_HOST_TOOLS=ON \
+          -DLLVM_TABLEGEN=/usr/local/opt/llvm/bin/llvm-tblgen \
           -DLLVM_USE_INTEL_JITEVENTS=OFF \
           -DLLVM_USE_OPROFILE=OFF \
           -DLLVM_ENABLE_DIA_SDK=OFF \
@@ -85,8 +88,6 @@ jobs:
           -DLLVM_ENABLE_WERROR=OFF \
           -DLLVM_ENABLE_DUMP=OFF \
           -DLLVM_ENABLE_LTO=OFF \
-          -DLLVM_PARALLEL_COMPILE_JOBS=$(sysctl -n hw.ncpu) \
-          -DLLVM_PARALLEL_LINK_JOBS=$(sysctl -n hw.ncpu) \
           -DHAVE_STEADY_CLOCK=0
 
         ninja
