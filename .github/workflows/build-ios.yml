@@ -69,7 +69,15 @@ jobs:
           -DLLVM_ENABLE_LTO=OFF \
           -DLLVM_TOOL_LLVM_TBLGEN_BUILD=ON \
           -DLLVM_BUILD_STATIC=ON \
-          -DBUILD_SHARED_LIBS=OFF
+          -DBUILD_SHARED_LIBS=OFF \
+          -DLLVM_ENABLE_MODULES=OFF \
+          -DLLVM_ENABLE_THREADS=OFF \
+          -DLLVM_ENABLE_PIC=OFF \
+          -DLLVM_ENABLE_TIMESTAMPS=OFF \
+          -DLLVM_ENABLE_UNWIND_TABLES=OFF \
+          -DLLVM_ENABLE_INSTALL_RPATH=OFF \
+          -DLLVM_ENABLE_GLOBAL_ISEL=OFF \
+          -DLLVM_ENABLE_LIBCXX=OFF
         ninja llvm-tblgen
         cd ..
 
