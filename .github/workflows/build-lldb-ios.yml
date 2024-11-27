@@ -35,63 +35,31 @@ jobs:
 
     - name: Build for iOS Device (arm64)
       run: |
-        # First build native tablegen
-        mkdir build-native
-        cd build-native
+        # First build LLVM with required components
+        mkdir build-llvm
+        cd build-llvm
         cmake ../llvm \
           -G Ninja \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DLLVM_TARGETS_TO_BUILD="" \
-          -DLLVM_ENABLE_PROJECTS="lldb" \
-          -DLLVM_BUILD_TOOLS=ON \
-          -DLLVM_INCLUDE_TOOLS=ON \
-          -DLLVM_TOOL_LLVM_TBLGEN_BUILD=ON \
-          -DLLDB_USE_SYSTEM_DEBUGSERVER=ON \
-          -DLLDB_SKIP_TESTS=ON \
-          -DLLDB_INCLUDE_TESTS=OFF \
-          -DLLDB_TEST_COMPILER="$(xcrun --find clang)" \
-          -DLLDB_TEST_C_COMPILER="$(xcrun --find clang)" \
-          -DLLDB_TEST_CXX_COMPILER="$(xcrun --find clang++)" \
-          -DLLDB_DISABLE_PYTHON=1 \
-          -DLLDB_DISABLE_CURSES=1 \
-          -DLLDB_DISABLE_LIBEDIT=1 \
-          -DLLDB_DISABLE_LZMA=1
-        ninja llvm-tblgen
-        NATIVE_TBLGEN=$(pwd)/bin/llvm-tblgen
+          -C ../lldb/cmake/caches/Apple-lldb-base.cmake \
+          -DLLVM_ENABLE_PROJECTS="clang" \
+          -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" \
+          -DCMAKE_BUILD_TYPE=Release
+        ninja
         cd ..
 
         # Then build LLDB for iOS
         mkdir build-ios-device
         cd build-ios-device
-        cmake ../llvm \
+        cmake ../lldb \
           -G Ninja \
+          -C ../lldb/cmake/caches/Apple-lldb-base.cmake \
           -DCMAKE_TOOLCHAIN_FILE=../ios.toolchain.cmake \
           -DPLATFORM=OS64 \
-          -DENABLE_BITCODE=0 \
-          -DENABLE_ARC=0 \
-          -DENABLE_VISIBILITY=1 \
           -DARCHS="arm64" \
           -DCMAKE_BUILD_TYPE=Release \
-          -DDEPLOYMENT_TARGET=13.0 \
-          -DLLVM_TARGETS_TO_BUILD="AArch64" \
-          -DLLVM_DEFAULT_TARGET_TRIPLE="arm64-apple-ios13.0" \
-          -DLLVM_ENABLE_PROJECTS="lldb" \
-          -DLLVM_BUILD_TOOLS=OFF \
-          -DLLVM_INCLUDE_TESTS=OFF \
-          -DLLVM_INCLUDE_EXAMPLES=OFF \
-          -DLLVM_BUILD_STATIC=ON \
-          -DBUILD_SHARED_LIBS=OFF \
-          -DLLVM_ENABLE_ASSERTIONS=OFF \
-          -DLLVM_ENABLE_EH=OFF \
-          -DLLVM_ENABLE_RTTI=OFF \
-          -DLLVM_ENABLE_MODULES=OFF \
-          -DLLVM_ENABLE_TERMINFO=OFF \
-          -DLLVM_ENABLE_LIBXML2=OFF \
-          -DLLVM_ENABLE_LIBEDIT=OFF \
-          -DLLVM_ENABLE_PYTHON=OFF \
-          -DLLVM_ENABLE_CURSES=OFF \
-          -DLLVM_ENABLE_LZMA=OFF \
-          -DLLVM_ENABLE_LUA=OFF \
+          -DLLVM_DIR=../build-llvm/lib/cmake/llvm \
+          -DLLDB_INCLUDE_TESTS=OFF \
+          -DLLDB_USE_SYSTEM_DEBUGSERVER=ON \
           -DLLDB_ENABLE_PYTHON=OFF \
           -DLLDB_ENABLE_LIBEDIT=OFF \
           -DLLDB_ENABLE_CURSES=OFF \
@@ -99,16 +67,13 @@ jobs:
           -DLLDB_ENABLE_LUA=OFF \
           -DLLDB_ENABLE_LIBXML2=OFF \
           -DLLDB_BUILD_FRAMEWORK=OFF \
-          -DLLDB_USE_SYSTEM_DEBUGSERVER=ON \
-          -DLLDB_SKIP_TESTS=ON \
-          -DLLDB_INCLUDE_TESTS=OFF \
-          -DLLDB_DISABLE_PYTHON=1 \
-          -DLLDB_DISABLE_CURSES=1 \
-          -DLLDB_DISABLE_LIBEDIT=1 \
-          -DLLDB_DISABLE_LZMA=1 \
-          -DLLVM_TABLEGEN="$NATIVE_TBLGEN"
+          -DENABLE_BITCODE=0 \
+          -DENABLE_ARC=0 \
+          -DENABLE_VISIBILITY=1 \
+          -DDEPLOYMENT_TARGET=13.0 \
+          -DLLVM_DEFAULT_TARGET_TRIPLE="arm64-apple-ios13.0"
 
-        ninja lldb-core
+        ninja liblldb
 
     - name: Package Library
       run: |
