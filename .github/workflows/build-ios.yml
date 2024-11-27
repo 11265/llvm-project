@@ -79,10 +79,15 @@ jobs:
           -DLLVM_TOOL_LLVM_CONFIG_BUILD=OFF \
           -DLLVM_TOOL_LLVM_MC_BUILD=OFF
         ninja llvm-tblgen
-        ls -la bin/  # 检查 bin 目录内容
-        NATIVE_TBLGEN="$(pwd)/bin/llvm-tblgen"
-        echo "Native tablegen path: $NATIVE_TBLGEN"  # 打印路径
+        ls -la .  # 检查当前目录
+        ls -la bin || true  # 检查 bin 目录（如果存在）
+        ls -la tools || true  # 检查 tools 目录（如果存在）
+        find . -name "llvm-tblgen*"  # 查找 llvm-tblgen
+        NATIVE_TBLGEN=$(find . -name "llvm-tblgen" -type f)  # 自动查找 tablegen
+        echo "Found tablegen at: $NATIVE_TBLGEN"  # 打印路径
+        test -n "$NATIVE_TBLGEN" || exit 1  # 确保找到了文件
         test -f "$NATIVE_TBLGEN" || exit 1  # 确保文件存在
+        test -x "$NATIVE_TBLGEN" || exit 1  # 确保文件可执行
         cd ..
 
         # Then build for iOS
