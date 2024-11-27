@@ -45,9 +45,10 @@ jobs:
           -DARCHS="arm64" \
           -DCMAKE_BUILD_TYPE=Release \
           -DDEPLOYMENT_TARGET=13.0 \
-          -DCMAKE_C_FLAGS="-arch arm64 -Wno-shorten-64-to-32" \
-          -DCMAKE_CXX_FLAGS="-arch arm64 -Wno-shorten-64-to-32" \
-          -DCMAKE_EXE_LINKER_FLAGS="-Wl,-no_pie" \
+          -DCMAKE_C_FLAGS="-arch arm64 -isysroot $(xcrun --sdk iphoneos --show-sdk-path)" \
+          -DCMAKE_CXX_FLAGS="-arch arm64 -isysroot $(xcrun --sdk iphoneos --show-sdk-path)" \
+          -DCMAKE_ASM_FLAGS="-arch arm64 -isysroot $(xcrun --sdk iphoneos --show-sdk-path)" \
+          -DCMAKE_EXE_LINKER_FLAGS="-arch arm64 -isysroot $(xcrun --sdk iphoneos --show-sdk-path)" \
           -DLLVM_TARGETS_TO_BUILD="AArch64" \
           -DLLVM_DEFAULT_TARGET_TRIPLE="arm64-apple-ios13.0" \
           -DLLVM_ENABLE_PROJECTS="" \
@@ -95,7 +96,9 @@ jobs:
           -DLLVM_ENABLE_DUMP=OFF \
           -DLLVM_ENABLE_EXPENSIVE_CHECKS=OFF \
           -DLLVM_ENABLE_TIMESTAMPS=OFF \
-          -DLLVM_ENABLE_UNWIND_TABLES=OFF
+          -DLLVM_ENABLE_UNWIND_TABLES=OFF \
+          -DLLVM_ENABLE_INSTALL_RPATH=OFF \
+          -DLLVM_ENABLE_GLOBAL_ISEL=OFF
 
         ninja
 
