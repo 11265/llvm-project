@@ -1,0 +1,113 @@
+name: Build LLDB iOS Static Library
+
+on:
+  push:
+    branches: [ main, master, develop, '*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: llvm/llvm-project
+        submodules: 'recursive'
+    
+    - name: Install CMake and LLVM
+      run: |
+        brew install cmake ninja llvm
+        echo "LLVM_PATH=$(brew --prefix llvm)" >> $GITHUB_ENV
+
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '15.0'
+        
+    - name: Download iOS toolchain
+      run: |
+        curl -L https://raw.githubusercontent.com/leetal/ios-cmake/master/ios.toolchain.cmake -o ios.toolchain.cmake
+
+    - name: Build for iOS Device (arm64)
+      run: |
+        # First build native tablegen
+        mkdir build-native
+        cd build-native
+        cmake ../llvm \
+          -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DLLVM_TARGETS_TO_BUILD="" \
+          -DLLVM_ENABLE_PROJECTS="lldb" \
+          -DLLVM_BUILD_TOOLS=ON \
+          -DLLVM_INCLUDE_TOOLS=ON \
+          -DLLVM_TOOL_LLVM_TBLGEN_BUILD=ON
+        ninja llvm-tblgen
+        NATIVE_TBLGEN=$(pwd)/bin/llvm-tblgen
+        cd ..
+
+        # Then build LLDB for iOS
+        mkdir build-ios-device
+        cd build-ios-device
+        cmake ../llvm \
+          -G Ninja \
+          -DCMAKE_TOOLCHAIN_FILE=../ios.toolchain.cmake \
+          -DPLATFORM=OS64 \
+          -DENABLE_BITCODE=0 \
+          -DENABLE_ARC=0 \
+          -DENABLE_VISIBILITY=1 \
+          -DARCHS="arm64" \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DDEPLOYMENT_TARGET=13.0 \
+          -DLLVM_TARGETS_TO_BUILD="AArch64" \
+          -DLLVM_DEFAULT_TARGET_TRIPLE="arm64-apple-ios13.0" \
+          -DLLVM_ENABLE_PROJECTS="lldb" \
+          -DLLVM_BUILD_TOOLS=OFF \
+          -DLLVM_INCLUDE_TESTS=OFF \
+          -DLLVM_INCLUDE_EXAMPLES=OFF \
+          -DLLVM_BUILD_STATIC=ON \
+          -DBUILD_SHARED_LIBS=OFF \
+          -DLLVM_ENABLE_ASSERTIONS=OFF \
+          -DLLVM_ENABLE_EH=OFF \
+          -DLLVM_ENABLE_RTTI=OFF \
+          -DLLVM_ENABLE_MODULES=OFF \
+          -DLLVM_ENABLE_TERMINFO=OFF \
+          -DLLVM_ENABLE_LIBXML2=OFF \
+          -DLLVM_ENABLE_LIBEDIT=OFF \
+          -DLLVM_ENABLE_PYTHON=OFF \
+          -DLLVM_ENABLE_CURSES=OFF \
+          -DLLVM_ENABLE_LZMA=OFF \
+          -DLLVM_ENABLE_LUA=OFF \
+          -DLLDB_ENABLE_PYTHON=OFF \
+          -DLLDB_ENABLE_LIBEDIT=OFF \
+          -DLLDB_ENABLE_CURSES=OFF \
+          -DLLDB_ENABLE_LZMA=OFF \
+          -DLLDB_ENABLE_LUA=OFF \
+          -DLLDB_ENABLE_LIBXML2=OFF \
+          -DLLDB_BUILD_FRAMEWORK=OFF \
+          -DLLVM_TABLEGEN="$NATIVE_TBLGEN"
+
+        ninja lldb
+
+    - name: Package Library
+      run: |
+        mkdir -p universal/lib
+        mkdir -p universal/include
+        
+        # Copy LLDB libraries
+        cp build-ios-device/lib/liblldb.a universal/lib/
+        
+        # Copy headers
+        cp -r lldb/include/* universal/include/
+        
+        # Create zip package
+        cd universal
+        zip -r ../lldb-ios.zip .
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: lldb-ios
+        path: lldb-ios.zip 
