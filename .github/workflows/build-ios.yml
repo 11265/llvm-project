@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-14
     
     steps:
     - uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
     - name: Setup Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.4'
+        xcode-version: '15.0'
         
     - name: Download iOS toolchain
       run: |
@@ -56,30 +56,29 @@ jobs:
           -DLLVM_ENABLE_TERMINFO=OFF \
           -DLLVM_ENABLE_ZLIB=OFF \
           -DLLVM_BUILD_STATIC=ON \
-          -DBUILD_SHARED_LIBS=OFF
+          -DBUILD_SHARED_LIBS=OFF \
+          -DCMAKE_INSTALL_PREFIX=../install
 
         ninja
+        ninja install
 
     - name: Package Library
       run: |
         mkdir -p universal/lib
         
         # Copy LLVM libraries
-        find build-ios-device/lib -name "*.a" -exec cp {} universal/lib/ \;
+        cp -r install/lib/* universal/lib/
         
         # Copy headers
         mkdir -p universal/include
-        cp -r build-ios-device/include/* universal/include/
-        cp -r llvm/include/* universal/include/
-        cp -r clang/include/* universal/include/
-        cp -r lldb/include/* universal/include/
+        cp -r install/include/* universal/include/
         
         # Create zip package
         cd universal
         zip -r ../llvm-ios.zip .
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: llvm-ios
         path: llvm-ios.zip
