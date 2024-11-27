@@ -56,7 +56,10 @@ jobs:
           -DLLVM_ENABLE_LIBXML2=OFF \
           -DLLVM_ENABLE_ZLIB=OFF
         ninja llvm-tblgen
-        NATIVE_TBLGEN="$PWD/bin/llvm-tblgen"
+        ls -la bin/  # 检查 bin 目录内容
+        NATIVE_TBLGEN="$(pwd)/bin/llvm-tblgen"
+        echo "Native tablegen path: $NATIVE_TBLGEN"  # 打印路径
+        test -f "$NATIVE_TBLGEN" || exit 1  # 确保文件存在
         cd ..
 
         # Then build for iOS
