@@ -34,7 +34,7 @@ jobs:
       run: |
         mkdir build-ios-device
         cd build-ios-device
-        cmake ../llvm \
+        cmake .. \
           -G Ninja \
           -DCMAKE_TOOLCHAIN_FILE=../ios.toolchain.cmake \
           -DPLATFORM=OS64 \
@@ -66,23 +66,27 @@ jobs:
           -DLLVM_OPTIMIZED_TABLEGEN=ON \
           -DLLVM_USE_INTEL_JITEVENTS=OFF \
           -DLLVM_USE_OPROFILE=OFF \
-          -DLLVM_ENABLE_DIA_SDK=OFF
+          -DLLVM_ENABLE_DIA_SDK=OFF \
+          -DLLVM_ENABLE_FFI=OFF \
+          -DLLVM_ENABLE_LIBEDIT=OFF \
+          -DLLVM_ENABLE_LIBXML2=OFF \
+          -DLLVM_ENABLE_OCAMLDOC=OFF \
+          -DLLVM_ENABLE_LIBPFM=OFF \
+          -DLLVM_ENABLE_BINDINGS=OFF
 
-        ninja
-        ninja install
+        ninja -j$(sysctl -n hw.ncpu)
 
     - name: Package Library
       run: |
         mkdir -p universal/lib
         
         # Copy LLVM libraries
-        cp -r install/lib/* universal/lib/ || true
+        find . -name "*.a" -exec cp {} universal/lib/ \;
         
         # Copy headers
         mkdir -p universal/include
-        cp -r install/include/* universal/include/ || true
-        cp -r llvm/include/* universal/include/ || true
-        cp -r clang/include/* universal/include/ || true
+        cp -r ../llvm/include/* universal/include/ || true
+        cp -r ../clang/include/* universal/include/ || true
         
         # Create zip package
         cd universal
