@@ -78,9 +78,19 @@ jobs:
           -DLLVM_INCLUDE_DOCS=OFF \
           -DLLVM_ENABLE_WARNINGS=OFF \
           -DLLVM_ENABLE_EXPENSIVE_CHECKS=OFF \
-          -DLLVM_ENABLE_TIMESTAMPS=OFF
+          -DLLVM_ENABLE_TIMESTAMPS=OFF \
+          -DLLVM_ENABLE_PLUGINS=OFF \
+          -DLLVM_ENABLE_PIC=OFF \
+          -DLLVM_BUILD_32_BITS=OFF \
+          -DLLVM_BUILD_LLVM_DYLIB=OFF \
+          -DLLVM_ENABLE_PEDANTIC=OFF \
+          -DLLVM_ENABLE_WERROR=OFF \
+          -DLLVM_ENABLE_DUMP=OFF \
+          -DLLVM_ENABLE_LTO=OFF \
+          -DLLVM_PARALLEL_COMPILE_JOBS=$(sysctl -n hw.ncpu) \
+          -DLLVM_PARALLEL_LINK_JOBS=$(sysctl -n hw.ncpu)
 
-        ninja -j$(sysctl -n hw.ncpu)
+        ninja
 
     - name: Package Library
       run: |
