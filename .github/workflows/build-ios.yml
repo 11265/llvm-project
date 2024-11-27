@@ -56,6 +56,7 @@ jobs:
           -DLLVM_ENABLE_LIBXML2=OFF \
           -DLLVM_ENABLE_ZLIB=OFF
         ninja llvm-tblgen
+        NATIVE_TBLGEN="$PWD/bin/llvm-tblgen"
         cd ..
 
         # Then build for iOS
@@ -92,7 +93,7 @@ jobs:
           -DLLVM_ENABLE_MODULES=OFF \
           -DLLVM_ENABLE_THREADS=ON \
           -DLLVM_OPTIMIZED_TABLEGEN=OFF \
-          -DLLVM_TABLEGEN_EXE=../build-native/bin/llvm-tblgen \
+          -DLLVM_TABLEGEN_EXE="$NATIVE_TBLGEN" \
           -DLLVM_BUILD_TABLEGEN=OFF \
           -DLLVM_ENABLE_TERMINFO=OFF \
           -DLLVM_ENABLE_LIBXML2=OFF \
