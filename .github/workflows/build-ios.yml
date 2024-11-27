@@ -33,6 +33,19 @@ jobs:
 
     - name: Build for iOS Device (arm64)
       run: |
+        # First build native tablegen
+        mkdir build-native
+        cd build-native
+        cmake ../llvm \
+          -G Ninja \
+          -DLLVM_TARGETS_TO_BUILD="AArch64" \
+          -DLLVM_BUILD_TOOLS=OFF \
+          -DLLVM_ENABLE_PROJECTS="" \
+          -DCMAKE_BUILD_TYPE=Release
+        ninja llvm-tblgen
+        cd ..
+
+        # Then build for iOS
         mkdir build-ios-device
         cd build-ios-device
         cmake ../llvm \
@@ -67,10 +80,8 @@ jobs:
           -DLLVM_ENABLE_MODULES=OFF \
           -DLLVM_ENABLE_THREADS=ON \
           -DLLVM_OPTIMIZED_TABLEGEN=OFF \
-          -DLLVM_USE_HOST_TOOLS=ON \
-          -DLLVM_TABLEGEN=$LLVM_PATH/bin/llvm-tblgen \
+          -DLLVM_TABLEGEN_EXE=../build-native/bin/llvm-tblgen \
           -DLLVM_BUILD_TABLEGEN=OFF \
-          -DLLVM_NATIVE_TOOL_DIR=$LLVM_PATH/bin \
           -DLLVM_ENABLE_TERMINFO=OFF \
           -DLLVM_ENABLE_LIBXML2=OFF \
           -DLLVM_ENABLE_LIBEDIT=OFF \
