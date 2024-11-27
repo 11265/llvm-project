@@ -61,7 +61,12 @@ jobs:
           -DLLVM_ENABLE_ASSERTIONS=OFF \
           -DLLVM_ENABLE_EH=OFF \
           -DLLVM_ENABLE_RTTI=OFF \
-          -DLLVM_ENABLE_MODULES=OFF
+          -DLLVM_ENABLE_MODULES=OFF \
+          -DLLVM_ENABLE_THREADS=ON \
+          -DLLVM_OPTIMIZED_TABLEGEN=ON \
+          -DLLVM_USE_INTEL_JITEVENTS=OFF \
+          -DLLVM_USE_OPROFILE=OFF \
+          -DLLVM_ENABLE_DIA_SDK=OFF
 
         ninja
         ninja install
@@ -76,6 +81,8 @@ jobs:
         # Copy headers
         mkdir -p universal/include
         cp -r install/include/* universal/include/ || true
+        cp -r llvm/include/* universal/include/ || true
+        cp -r clang/include/* universal/include/ || true
         
         # Create zip package
         cd universal
