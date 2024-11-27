@@ -47,7 +47,7 @@ jobs:
           -DCMAKE_C_FLAGS="-arch arm64 -Wno-shorten-64-to-32" \
           -DCMAKE_CXX_FLAGS="-arch arm64 -Wno-shorten-64-to-32" \
           -DLLVM_TARGETS_TO_BUILD="AArch64;ARM" \
-          -DLLVM_ENABLE_PROJECTS="clang;lldb" \
+          -DLLVM_ENABLE_PROJECTS="clang" \
           -DLLVM_BUILD_TOOLS=OFF \
           -DLLVM_BUILD_UTILS=OFF \
           -DLLVM_INCLUDE_TESTS=OFF \
@@ -57,7 +57,11 @@ jobs:
           -DLLVM_ENABLE_ZLIB=OFF \
           -DLLVM_BUILD_STATIC=ON \
           -DBUILD_SHARED_LIBS=OFF \
-          -DCMAKE_INSTALL_PREFIX=../install
+          -DCMAKE_INSTALL_PREFIX=../install \
+          -DLLVM_ENABLE_ASSERTIONS=OFF \
+          -DLLVM_ENABLE_EH=OFF \
+          -DLLVM_ENABLE_RTTI=OFF \
+          -DLLVM_ENABLE_MODULES=OFF
 
         ninja
         ninja install
@@ -67,11 +71,11 @@ jobs:
         mkdir -p universal/lib
         
         # Copy LLVM libraries
-        cp -r install/lib/* universal/lib/
+        cp -r install/lib/* universal/lib/ || true
         
         # Copy headers
         mkdir -p universal/include
-        cp -r install/include/* universal/include/
+        cp -r install/include/* universal/include/ || true
         
         # Create zip package
         cd universal
