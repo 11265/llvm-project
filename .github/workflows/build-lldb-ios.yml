@@ -43,7 +43,9 @@ jobs:
           -DLLVM_ENABLE_PROJECTS="lldb" \
           -DLLVM_BUILD_TOOLS=ON \
           -DLLVM_INCLUDE_TOOLS=ON \
-          -DLLVM_TOOL_LLVM_TBLGEN_BUILD=ON
+          -DLLVM_TOOL_LLVM_TBLGEN_BUILD=ON \
+          -DLLDB_USE_SYSTEM_DEBUGSERVER=ON \
+          -DLLDB_SKIP_TESTS=ON
         ninja llvm-tblgen
         NATIVE_TBLGEN=$(pwd)/bin/llvm-tblgen
         cd ..
@@ -87,9 +89,12 @@ jobs:
           -DLLDB_ENABLE_LUA=OFF \
           -DLLDB_ENABLE_LIBXML2=OFF \
           -DLLDB_BUILD_FRAMEWORK=OFF \
+          -DLLDB_USE_SYSTEM_DEBUGSERVER=ON \
+          -DLLDB_SKIP_TESTS=ON \
+          -DLLDB_INCLUDE_TESTS=OFF \
           -DLLVM_TABLEGEN="$NATIVE_TBLGEN"
 
-        ninja lldb
+        ninja liblldb
 
     - name: Package Library
       run: |
@@ -97,7 +102,7 @@ jobs:
         mkdir -p universal/include
         
         # Copy LLDB libraries
-        cp build-ios-device/lib/liblldb.a universal/lib/
+        find build-ios-device -name "liblldb*.a" -exec cp {} universal/lib/ \;
         
         # Copy headers
         cp -r lldb/include/* universal/include/
@@ -110,4 +115,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: lldb-ios
-        path: lldb-ios.zip 
+        path: lldb-ios.zip
