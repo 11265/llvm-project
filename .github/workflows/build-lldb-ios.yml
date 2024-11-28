@@ -43,8 +43,13 @@ jobs:
           -C ../lldb/cmake/caches/Apple-lldb-base.cmake \
           -DLLVM_ENABLE_PROJECTS="clang" \
           -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" \
-          -DCMAKE_BUILD_TYPE=Release
-        ninja
+          -DCMAKE_BUILD_TYPE=Release \
+          -DLLVM_TARGETS_TO_BUILD="AArch64" \
+          -DLLVM_BUILD_TOOLS=ON \
+          -DLLVM_INCLUDE_TOOLS=ON \
+          -DLLVM_TOOL_CLANG_BUILD=ON \
+          -DLLVM_DISTRIBUTION_COMPONENTS="clang;clang-resource-headers;clang-format;clang-tidy;clang-apply-replacements;clang-headers;libclang;libclang-headers"
+        ninja distribution
         cd ..
 
         # Then build LLDB for iOS
@@ -58,6 +63,7 @@ jobs:
           -DARCHS="arm64" \
           -DCMAKE_BUILD_TYPE=Release \
           -DLLVM_DIR=../build-llvm/lib/cmake/llvm \
+          -DCLANG_DIR=../build-llvm/lib/cmake/clang \
           -DLLDB_INCLUDE_TESTS=OFF \
           -DLLDB_USE_SYSTEM_DEBUGSERVER=ON \
           -DLLDB_ENABLE_PYTHON=OFF \
